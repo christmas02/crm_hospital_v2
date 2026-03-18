@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Facture extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'numero',
@@ -20,6 +21,20 @@ class Facture extends Model
         'envoye_par',
         'mode_paiement',
         'date_paiement',
+        'montant_remise',
+        'montant_tva',
+        'montant_net',
+        'montant_paye',
+        'montant_restant',
+        'notes',
+        'reference_paiement',
+        'encaisse_par',
+        'type_prise_en_charge',
+        'organisme_prise_en_charge',
+        'numero_assurance',
+        'taux_couverture',
+        'montant_couvert',
+        'montant_patient',
     ];
 
     protected $casts = [
@@ -54,6 +69,21 @@ class Facture extends Model
         return $this->hasMany(Paiement::class);
     }
 
+    public function encaisseur()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'encaisse_par');
+    }
+
+    public function avoirs()
+    {
+        return $this->hasMany(\App\Models\Avoir::class);
+    }
+
+    public function remboursements()
+    {
+        return $this->hasMany(\App\Models\Remboursement::class);
+    }
+
     // Accessor pour montant_total - calcule depuis les lignes ou utilise montant
     public function getMontantTotalAttribute()
     {
@@ -64,5 +94,19 @@ class Facture extends Model
             });
         }
         return $this->montant ?? 0;
+    }
+
+    public function estPartiellementPayee(): bool
+    {
+        return $this->montant_paye > 0 && $this->montant_paye < $this->montant_net;
+    }
+
+    public function calculerMontants()
+    {
+        $sousTotal = $this->lignes->sum(fn($l) => $l->quantite * $l->prix_unitaire);
+        $this->montant = $sousTotal;
+        $this->montant_net = $sousTotal - $this->montant_remise + $this->montant_tva;
+        $this->montant_restant = $this->montant_net - $this->montant_paye;
+        $this->save();
     }
 }

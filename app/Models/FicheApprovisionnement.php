@@ -18,12 +18,15 @@ class FicheApprovisionnement extends Model
         'total_articles',
         'total_quantite',
         'montant_total',
+        'statut',
+        'date_reception',
         'observations',
         'cree_par',
     ];
 
     protected $casts = [
         'date' => 'date',
+        'date_reception' => 'date',
     ];
 
     public function lignes()

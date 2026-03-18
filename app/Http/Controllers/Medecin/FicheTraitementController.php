@@ -23,71 +23,80 @@ class FicheTraitementController extends Controller
             'actes.*.quantite' => 'required_with:actes|integer|min:1',
         ]);
 
-        DB::transaction(function () use ($validated, $consultation) {
-            $totalFacturable = 0;
-            $acteData = [];
+        try {
+            DB::transaction(function () use ($validated, $consultation) {
+                $totalFacturable = 0;
+                $acteData = [];
 
-            foreach ($validated['actes'] ?? [] as $acte) {
-                $acteMedical = ActeMedical::find($acte['id']);
-                $subtotal = $acteMedical->prix * $acte['quantite'];
+                foreach ($validated['actes'] ?? [] as $acte) {
+                    $acteMedical = ActeMedical::find($acte['id']);
+                    $subtotal = $acteMedical->prix * $acte['quantite'];
 
-                if ($acteMedical->facturable) {
-                    $totalFacturable += $subtotal;
-                }
-
-                $acteData[$acte['id']] = [
-                    'nom'        => $acteMedical->nom,
-                    'prix'       => $acteMedical->prix,
-                    'quantite'   => $acte['quantite'],
-                    'facturable' => $acteMedical->facturable,
-                ];
-            }
-
-            $fiche = FicheTraitement::updateOrCreate(
-                ['consultation_id' => $consultation->id],
-                [
-                    'patient_id'       => $consultation->patient_id,
-                    'medecin_id'       => $consultation->medecin_id,
-                    'date'             => now(),
-                    'diagnostic'       => $validated['diagnostic'],
-                    'observations'     => $validated['observations'] ?? null,
-                    'total_facturable' => $totalFacturable,
-                ]
-            );
-
-            if (!empty($acteData)) {
-                $fiche->actes()->sync($acteData);
-            }
-
-            // Créer ou mettre à jour la facture
-            if ($totalFacturable > 0 && !$consultation->facture()->exists()) {
-                $numero = 'FAC-' . date('Y') . '-' . str_pad(Facture::count() + 1, 4, '0', STR_PAD_LEFT);
-
-                $facture = Facture::create([
-                    'numero'              => $numero,
-                    'patient_id'          => $consultation->patient_id,
-                    'consultation_id'     => $consultation->id,
-                    'fiche_traitement_id' => $fiche->id,
-                    'date'                => now(),
-                    'montant'             => $totalFacturable,
-                    'statut'              => 'en_attente',
-                    'envoye_par'          => 'medecin',
-                ]);
-
-                foreach ($acteData as $id => $data) {
-                    if ($data['facturable']) {
-                        FactureLigne::create([
-                            'facture_id'    => $facture->id,
-                            'description'   => $data['nom'],
-                            'quantite'      => $data['quantite'],
-                            'prix_unitaire' => $data['prix'],
-                            'total'         => $data['prix'] * $data['quantite'],
-                        ]);
+                    if ($acteMedical->facturable) {
+                        $totalFacturable += $subtotal;
                     }
-                }
-            }
-        });
 
-        return redirect()->back()->with('success', 'Fiche de traitement enregistrée');
+                    $acteData[$acte['id']] = [
+                        'nom'        => $acteMedical->nom,
+                        'prix'       => $acteMedical->prix,
+                        'quantite'   => $acte['quantite'],
+                        'facturable' => $acteMedical->facturable,
+                    ];
+                }
+
+                $fiche = FicheTraitement::updateOrCreate(
+                    ['consultation_id' => $consultation->id],
+                    [
+                        'patient_id'       => $consultation->patient_id,
+                        'medecin_id'       => $consultation->medecin_id,
+                        'date'             => now(),
+                        'diagnostic'       => $validated['diagnostic'],
+                        'observations'     => $validated['observations'] ?? null,
+                        'total_facturable' => $totalFacturable,
+                    ]
+                );
+
+                if (!empty($acteData)) {
+                    $fiche->actes()->sync($acteData);
+                }
+
+                // Créer ou mettre à jour la facture
+                if ($totalFacturable > 0 && !$consultation->facture()->exists()) {
+                    $numero = 'FAC-' . date('Y') . '-' . str_pad(Facture::whereYear('created_at', date('Y'))->count() + 1, 5, '0', STR_PAD_LEFT);
+
+                    $facture = Facture::create([
+                        'numero'              => $numero,
+                        'patient_id'          => $consultation->patient_id,
+                        'consultation_id'     => $consultation->id,
+                        'fiche_traitement_id' => $fiche->id,
+                        'date'                => now(),
+                        'montant'             => $totalFacturable,
+                        'statut'              => 'en_attente',
+                        'envoye_par'          => 'medecin',
+                    ]);
+
+                    foreach ($acteData as $id => $data) {
+                        if ($data['facturable']) {
+                            FactureLigne::create([
+                                'facture_id'    => $facture->id,
+                                'description'   => $data['nom'],
+                                'quantite'      => $data['quantite'],
+                                'prix_unitaire' => $data['prix'],
+                                'total'         => $data['prix'] * $data['quantite'],
+                            ]);
+                        }
+                    }
+
+                    // Notify caisse staff
+                    \App\Models\User::where('role', 'caisse')->each(function($u) use ($facture) {
+                        $u->notify(new \App\Notifications\NouvelleFacture($facture));
+                    });
+                }
+            });
+
+            return redirect()->back()->with('success', 'Fiche de traitement enregistrée');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Une erreur est survenue : ' . $e->getMessage());
+        }
     }
 }

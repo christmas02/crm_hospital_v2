@@ -3,26 +3,48 @@
 namespace Database\Seeders;
 
 use App\Models\Transaction;
+use App\Models\Paiement;
 use Illuminate\Database\Seeder;
 
 class TransactionSeeder extends Seeder
 {
     public function run()
     {
-        $transactions = [
-            ['id' => 1, 'date' => '2024-02-20', 'type' => 'entree', 'montant' => 15000, 'description' => 'Paiement consultation #1', 'categorie' => 'consultation'],
-            ['id' => 2, 'date' => '2024-02-20', 'type' => 'entree', 'montant' => 7500, 'description' => 'Vente médicaments', 'categorie' => 'pharmacie'],
-            ['id' => 3, 'date' => '2024-02-20', 'type' => 'entree', 'montant' => 30000, 'description' => 'Paiement consultation #3', 'categorie' => 'consultation'],
-            ['id' => 4, 'date' => '2024-02-20', 'type' => 'entree', 'montant' => 25000, 'description' => 'Paiement consultation #4', 'categorie' => 'consultation'],
-            ['id' => 5, 'date' => '2024-02-20', 'type' => 'sortie', 'montant' => 15000, 'description' => 'Achat fournitures', 'categorie' => 'depense'],
-            ['id' => 6, 'date' => '2024-02-20', 'type' => 'entree', 'montant' => 50000, 'description' => 'Hospitalisation #5', 'categorie' => 'hospitalisation'],
-            ['id' => 7, 'date' => '2024-02-19', 'type' => 'entree', 'montant' => 45000, 'description' => 'Consultations diverses', 'categorie' => 'consultation'],
-            ['id' => 8, 'date' => '2024-02-19', 'type' => 'sortie', 'montant' => 80000, 'description' => 'Commande médicaments', 'categorie' => 'pharmacie'],
-            ['id' => 9, 'date' => '2024-02-18', 'type' => 'entree', 'montant' => 120000, 'description' => 'Paiements divers', 'categorie' => 'autre'],
+        // Create entrees from paiements
+        $paiements = Paiement::where('statut', 'paye')->get();
+        foreach ($paiements as $paiement) {
+            Transaction::create([
+                'date' => $paiement->date_paiement,
+                'type' => 'entree',
+                'montant' => $paiement->montant,
+                'description' => 'Encaissement ' . $paiement->description,
+                'categorie' => 'consultation',
+            ]);
+        }
+
+        // Create sorties (expenses) over 60 days
+        $depenses = [
+            ['Achat de fournitures bureau', 'fournitures', 15000, 45000],
+            ['Produits d\'entretien', 'maintenance', 25000, 50000],
+            ['Achat médicaments pharmacie', 'pharmacie', 50000, 200000],
+            ['Réparation climatisation', 'maintenance', 30000, 80000],
+            ['Fournitures médicales', 'fournitures', 20000, 100000],
+            ['Eau et électricité', 'maintenance', 40000, 60000],
+            ['Achat de gants et masques', 'pharmacie', 10000, 30000],
+            ['Transport analyses laboratoire', 'autre', 5000, 15000],
+            ['Maintenance équipements', 'maintenance', 50000, 150000],
+            ['Impression documents', 'fournitures', 8000, 20000],
         ];
 
-        foreach ($transactions as $transaction) {
-            Transaction::create($transaction);
+        for ($i = 0; $i < 25; $i++) {
+            $dep = $depenses[array_rand($depenses)];
+            Transaction::create([
+                'date' => now()->subDays(rand(0, 60)),
+                'type' => 'sortie',
+                'montant' => rand($dep[2], $dep[3]),
+                'description' => $dep[0],
+                'categorie' => $dep[1],
+            ]);
         }
     }
 }
