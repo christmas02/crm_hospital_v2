@@ -9,23 +9,31 @@ class PlanningSeeder extends Seeder
 {
     public function run()
     {
-        $jours = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi'];
-        $medecins = \App\Models\Medecin::all();
+        $planning = [
+            ['medecin_id' => 1, 'jour' => 'lundi', 'debut' => '08:00', 'fin' => '16:00'],
+            ['medecin_id' => 1, 'jour' => 'mardi', 'debut' => '08:00', 'fin' => '16:00'],
+            ['medecin_id' => 1, 'jour' => 'mercredi', 'debut' => '08:00', 'fin' => '12:00'],
+            ['medecin_id' => 1, 'jour' => 'jeudi', 'debut' => '08:00', 'fin' => '16:00'],
+            ['medecin_id' => 1, 'jour' => 'vendredi', 'debut' => '08:00', 'fin' => '16:00'],
+            ['medecin_id' => 2, 'jour' => 'lundi', 'debut' => '09:00', 'fin' => '17:00'],
+            ['medecin_id' => 2, 'jour' => 'mardi', 'debut' => '09:00', 'fin' => '17:00'],
+            ['medecin_id' => 2, 'jour' => 'jeudi', 'debut' => '09:00', 'fin' => '17:00'],
+            ['medecin_id' => 2, 'jour' => 'vendredi', 'debut' => '09:00', 'fin' => '14:00'],
+            ['medecin_id' => 3, 'jour' => 'lundi', 'debut' => '08:00', 'fin' => '14:00'],
+            ['medecin_id' => 3, 'jour' => 'mercredi', 'debut' => '08:00', 'fin' => '14:00'],
+            ['medecin_id' => 3, 'jour' => 'vendredi', 'debut' => '08:00', 'fin' => '14:00'],
+            ['medecin_id' => 4, 'jour' => 'lundi', 'debut' => '08:00', 'fin' => '16:00'],
+            ['medecin_id' => 4, 'jour' => 'mardi', 'debut' => '08:00', 'fin' => '16:00'],
+            ['medecin_id' => 4, 'jour' => 'mercredi', 'debut' => '08:00', 'fin' => '16:00'],
+            ['medecin_id' => 4, 'jour' => 'jeudi', 'debut' => '08:00', 'fin' => '16:00'],
+            ['medecin_id' => 5, 'jour' => 'mardi', 'debut' => '07:00', 'fin' => '15:00'],
+            ['medecin_id' => 5, 'jour' => 'jeudi', 'debut' => '07:00', 'fin' => '15:00'],
+            ['medecin_id' => 6, 'jour' => 'lundi', 'debut' => '10:00', 'fin' => '16:00'],
+            ['medecin_id' => 6, 'jour' => 'mercredi', 'debut' => '10:00', 'fin' => '16:00'],
+        ];
 
-        foreach ($medecins as $medecin) {
-            // Each doctor works 4-5 days, with some variation
-            $workDays = collect($jours)->random(rand(4, 5));
-            foreach ($workDays as $jour) {
-                $debut = ['07:00', '07:30', '08:00', '08:30'][rand(0, 3)];
-                $fin = ['16:00', '16:30', '17:00', '17:30', '18:00'][rand(0, 4)];
-
-                Planning::create([
-                    'medecin_id' => $medecin->id,
-                    'jour' => $jour,
-                    'debut' => $debut,
-                    'fin' => $fin,
-                ]);
-            }
+        foreach ($planning as $p) {
+            Planning::create($p);
         }
     }
 }

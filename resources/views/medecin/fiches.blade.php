@@ -18,14 +18,14 @@
 <div class="card">
     <div class="card-header">
         <h2 class="card-title">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px;vertical-align:-3px;"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h6"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px;"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h6"/></svg>
             Fiches de traitement
         </h2>
         <span class="text-muted text-sm">{{ $fiches->total() }} fiches au total</span>
     </div>
     <div class="card-body no-pad">
         <div class="table-wrap">
-            <table class="table-patients">
+            <table>
                 <thead>
                     <tr>
                         <th>Date</th>
@@ -40,10 +40,7 @@
                 <tbody>
                     @forelse($fiches as $fiche)
                     <tr>
-                        <td>
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" stroke-width="2" style="vertical-align:-2px;margin-right:4px;"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                            {{ $fiche->date->format('d/m/Y') }}
-                        </td>
+                        <td>{{ $fiche->date->format('d/m/Y') }}</td>
                         <td>
                             <div class="user-cell">
                                 <div class="avatar">{{ strtoupper(substr($fiche->patient->prenom, 0, 1) . substr($fiche->patient->nom, 0, 1)) }}</div>
@@ -80,15 +77,14 @@
                             @endif
                         </td>
                         <td>
-                            <a href="{{ route('medecin.consultations.show', $fiche->consultation_id) }}" class="btn btn-primary btn-sm"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:4px;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Voir</a>
+                            <a href="{{ route('medecin.consultations.show', $fiche->consultation_id) }}" class="btn btn-outline btn-sm">Voir</a>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" style="text-align:center;padding:32px;">
-                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--gray-300)" stroke-width="1.5" style="margin-bottom:8px;"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
-                            <div class="text-muted" style="font-size:.875rem;">Aucune fiche de traitement</div>
-                            <div class="text-muted" style="font-size:.75rem;margin-top:4px;">Les fiches apparaitront après les consultations</div>
+                        <td colspan="7" class="text-center" style="padding:60px;">
+                            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5" style="margin:0 auto 16px;display:block;"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+                            <p style="color:var(--gray-500);">Aucune fiche de traitement</p>
                         </td>
                     </tr>
                     @endforelse

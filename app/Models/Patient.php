@@ -4,13 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Notifications\Notifiable;
 
 class Patient extends Model
 {
-    use HasFactory, SoftDeletes, Notifiable;
-    use \App\Traits\TracksChanges;
+    use HasFactory;
 
     protected $fillable = [
         'nom',
@@ -65,35 +62,6 @@ class Patient extends Model
     public function factures()
     {
         return $this->hasMany(Facture::class);
-    }
-
-    public function documents()
-    {
-        return $this->hasMany(PatientDocument::class);
-    }
-
-    public function signesVitaux()
-    {
-        return $this->hasMany(SigneVital::class);
-    }
-
-    public function certificats()
-    {
-        return $this->hasMany(CertificatMedical::class);
-    }
-
-    public function vaccinations()
-    {
-        return $this->hasMany(Vaccination::class);
-    }
-
-    public function demandesLabo() { return $this->hasMany(DemandeLabo::class); }
-
-    public function references() { return $this->hasMany(Reference::class); }
-
-    public function routeNotificationForMail()
-    {
-        return $this->email;
     }
 
     public function getNomCompletAttribute()

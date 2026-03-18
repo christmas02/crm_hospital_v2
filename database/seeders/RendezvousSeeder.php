@@ -9,20 +9,17 @@ class RendezvousSeeder extends Seeder
 {
     public function run()
     {
-        $patients = \App\Models\Patient::all();
-        $medecins = \App\Models\Medecin::all();
-        $motifs = ['Contrôle de routine', 'Suivi traitement', 'Résultats d\'analyses', 'Douleurs persistantes', 'Renouvellement ordonnance', 'Vaccination', 'Bilan annuel', 'Suivi post-opératoire'];
-        $statuts = ['en_attente', 'en_attente', 'en_attente', 'confirme', 'confirme'];
+        $rendezvous = [
+            ['id' => 1, 'patient_id' => 1, 'medecin_id' => 1, 'date' => '2024-02-25', 'heure' => '09:00', 'motif' => 'Contrôle post-traitement', 'statut' => 'confirme'],
+            ['id' => 2, 'patient_id' => 3, 'medecin_id' => 2, 'date' => '2024-03-05', 'heure' => '10:00', 'motif' => 'Suivi grossesse', 'statut' => 'confirme'],
+            ['id' => 3, 'patient_id' => 2, 'medecin_id' => 3, 'date' => '2024-02-27', 'heure' => '11:00', 'motif' => 'ECG de contrôle', 'statut' => 'confirme'],
+            ['id' => 4, 'patient_id' => 5, 'medecin_id' => 4, 'date' => '2024-02-22', 'heure' => '14:00', 'motif' => 'Rappel vaccin', 'statut' => 'en_attente'],
+            ['id' => 5, 'patient_id' => 7, 'medecin_id' => 6, 'date' => '2024-02-23', 'heure' => '09:30', 'motif' => 'Consultation dermatologique', 'statut' => 'confirme'],
+            ['id' => 6, 'patient_id' => 9, 'medecin_id' => 2, 'date' => '2024-02-28', 'heure' => '10:30', 'motif' => 'Échographie', 'statut' => 'confirme'],
+        ];
 
-        for ($i = 0; $i < 15; $i++) {
-            Rendezvous::create([
-                'patient_id' => $patients->random()->id,
-                'medecin_id' => $medecins->random()->id,
-                'date' => now()->addDays(rand(1, 14)),
-                'heure' => sprintf('%02d:%02d', rand(8, 16), [0, 15, 30, 45][rand(0, 3)]),
-                'motif' => $motifs[array_rand($motifs)],
-                'statut' => $statuts[array_rand($statuts)],
-            ]);
+        foreach ($rendezvous as $rdv) {
+            Rendezvous::create($rdv);
         }
     }
 }

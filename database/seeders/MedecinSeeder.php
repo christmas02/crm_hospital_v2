@@ -21,12 +21,5 @@ class MedecinSeeder extends Seeder
         foreach ($medecins as $medecin) {
             Medecin::create($medecin);
         }
-
-        // Lier le user médecin au premier médecin
-        $medecinUser = \App\Models\User::where('email', 'medecin@medicare.ci')->first();
-        $firstMedecin = Medecin::first();
-        if ($medecinUser && $firstMedecin) {
-            $firstMedecin->update(['user_id' => $medecinUser->id]);
-        }
     }
 }

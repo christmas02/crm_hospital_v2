@@ -30,29 +30,6 @@ class DispensationController extends Controller
             'remis_a' => $validated['remis_a'],
         ]);
 
-        // Auto-decrement stock for each medication in the ordonnance
-        $ordonnance->load('medicaments');
-        foreach ($ordonnance->medicaments as $med) {
-            $medicament = \App\Models\Medicament::find($med->medicament_id);
-            if ($medicament && isset($med->quantite) && $med->quantite > 0) {
-                $medicament->decrement('stock', $med->quantite);
-
-                // Create movement record
-                \App\Models\MouvementStock::create([
-                    'medicament_id' => $medicament->id,
-                    'type' => 'sortie',
-                    'quantite' => $med->quantite,
-                    'motif' => 'Dispensation ordonnance - Patient: ' . $ordonnance->patient->prenom . ' ' . $ordonnance->patient->nom,
-                    'date' => now(),
-                ]);
-
-                // Check if stock is now below minimum
-                if ($medicament->fresh()->stock <= $medicament->stock_min) {
-                    \App\Models\User::where('role', 'pharmacie')->each(fn($u) => $u->notify(new \App\Notifications\StockBas($medicament->fresh())));
-                }
-            }
-        }
-
         return redirect()->back()->with('success', 'Médicaments remis');
     }
 }

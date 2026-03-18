@@ -40,15 +40,9 @@
     </div>
 
     <div class="card">
-        <div class="card-header">
-            <h2 class="card-title">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px;vertical-align:-3px;"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                Liste des rendez-vous
-            </h2>
-        </div>
         <div class="card-body no-pad">
             <div class="table-wrap">
-                <table class="table-patients">
+                <table>
                     <thead>
                         <tr><th>Patient</th><th>Date</th><th>Heure</th><th>Médecin</th><th>Motif</th><th>Statut</th></tr>
                     </thead>
@@ -61,24 +55,9 @@
                                     <span>{{ $rdv->patient->prenom }} {{ $rdv->patient->nom }}</span>
                                 </div>
                             </td>
-                            <td>
-                                <div style="display:flex;align-items:center;gap:8px;">
-                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                                    {{ \Carbon\Carbon::parse($rdv->date)->format('d/m/Y') }}
-                                </div>
-                            </td>
-                            <td>
-                                <div style="display:flex;align-items:center;gap:8px;">
-                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                                    {{ $rdv->heure }}
-                                </div>
-                            </td>
-                            <td>
-                                <div style="display:flex;align-items:center;gap:8px;">
-                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                                    Dr. {{ $rdv->medecin->prenom }} {{ $rdv->medecin->nom }}
-                                </div>
-                            </td>
+                            <td>{{ \Carbon\Carbon::parse($rdv->date)->format('d/m/Y') }}</td>
+                            <td>{{ $rdv->heure }}</td>
+                            <td>Dr. {{ $rdv->medecin->prenom }} {{ $rdv->medecin->nom }}</td>
                             <td class="truncate" style="max-width:180px;">{{ $rdv->motif }}</td>
                             <td>
                                 @php $sc = ['en_attente'=>['warning','En attente'],'confirme'=>['success','Confirmé'],'annule'=>['secondary','Annulé']]; $s = $sc[$rdv->statut] ?? ['secondary',$rdv->statut]; @endphp
@@ -86,11 +65,7 @@
                             </td>
                         </tr>
                         @empty
-                        <tr><td colspan="6" style="text-align:center;padding:32px;">
-                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--gray-300)" stroke-width="1.5" style="margin-bottom:8px;"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                            <div class="text-muted" style="font-size:.875rem;">Aucun rendez-vous</div>
-                            <div class="text-muted" style="font-size:.75rem;margin-top:4px;">Planifiez un nouveau rendez-vous pour commencer</div>
-                        </td></tr>
+                        <tr><td colspan="6" class="text-center text-muted" style="padding:40px;">Aucun rendez-vous</td></tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -119,31 +94,18 @@
     @if($planningMedecin !== null)
     <div class="card">
         <div class="card-header">
-            <h2 class="card-title">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px;vertical-align:-3px;"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                Planning hebdomadaire
-            </h2>
+            <h2 class="card-title">Planning hebdomadaire</h2>
         </div>
         <div class="card-body no-pad">
             <div class="table-wrap">
-                <table class="table-patients">
+                <table>
                     <thead><tr><th>Jour</th><th>Début</th><th>Fin</th><th>Durée</th></tr></thead>
                     <tbody>
                         @forelse($planningMedecin as $p)
                         <tr>
                             <td><span style="font-weight:600;text-transform:capitalize;">{{ $p->jour }}</span></td>
-                            <td>
-                                <div style="display:flex;align-items:center;gap:8px;">
-                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                                    {{ $p->debut }}
-                                </div>
-                            </td>
-                            <td>
-                                <div style="display:flex;align-items:center;gap:8px;">
-                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                                    {{ $p->fin }}
-                                </div>
-                            </td>
+                            <td>{{ $p->debut }}</td>
+                            <td>{{ $p->fin }}</td>
                             <td class="text-muted text-sm">
                                 @php
                                     $debut = \Carbon\Carbon::createFromTimeString($p->debut);
@@ -154,11 +116,7 @@
                             </td>
                         </tr>
                         @empty
-                        <tr><td colspan="4" style="text-align:center;padding:32px;">
-                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--gray-300)" stroke-width="1.5" style="margin-bottom:8px;"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                            <div class="text-muted" style="font-size:.875rem;">Aucun planning défini</div>
-                            <div class="text-muted" style="font-size:.75rem;margin-top:4px;">Ce médecin n'a pas encore de planning configuré</div>
-                        </td></tr>
+                        <tr><td colspan="4" class="text-center text-muted" style="padding:40px;">Aucun planning défini</td></tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -168,9 +126,8 @@
     @else
     <div class="card">
         <div class="card-body text-center" style="padding:80px;">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--gray-300)" stroke-width="1.5" style="margin:0 auto 8px;display:block;"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-            <div class="text-muted" style="font-size:.875rem;">Sélectionnez un médecin pour voir son planning</div>
-            <div class="text-muted" style="font-size:.75rem;margin-top:4px;">Choisissez un médecin dans la liste déroulante ci-dessus</div>
+            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5" style="margin:0 auto 16px;display:block;"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            <p style="color:var(--gray-500);">Sélectionnez un médecin pour voir son planning</p>
         </div>
     </div>
     @endif
@@ -180,10 +137,7 @@
 <div class="modal-overlay" id="modalRdv">
     <div class="modal" style="max-width:520px;">
         <div class="modal-header">
-            <h3 class="modal-title">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px;vertical-align:-3px;"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                Nouveau Rendez-vous
-            </h3>
+            <h3 class="modal-title">Nouveau Rendez-vous</h3>
             <button class="modal-close" onclick="closeModal('modalRdv')">✕</button>
         </div>
         <form action="{{ route('admin.rendezvous.store') }}" method="POST">
@@ -193,7 +147,7 @@
                     <label class="form-label">Patient *</label>
                     <select name="patient_id" class="form-control" required>
                         <option value="">Sélectionner un patient</option>
-                        @foreach($patients as $p)
+                        @foreach(\App\Models\Patient::orderBy('nom')->get() as $p)
                         <option value="{{ $p->id }}">{{ $p->prenom }} {{ $p->nom }}</option>
                         @endforeach
                     </select>

@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use App\Models\Medecin;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -47,7 +46,5 @@ class UserSeeder extends Seeder
         foreach ($users as $user) {
             User::create($user);
         }
-
-        // Note: le lien User-Medecin est fait dans MedecinSeeder (après création des médecins)
     }
 }

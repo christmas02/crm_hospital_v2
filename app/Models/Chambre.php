@@ -17,7 +17,6 @@ class Chambre extends Model
         'tarif_jour',
         'statut',
         'patient_id',
-        'equipements',
     ];
 
     public function patient()

@@ -37,14 +37,14 @@
 <div class="card">
     <div class="card-header">
         <h2 class="card-title">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px;vertical-align:-3px;"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px;"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
             Patients en attente
         </h2>
         <span class="badge badge-warning">{{ $consultations->count() }}</span>
     </div>
     <div class="card-body no-pad">
         <div class="table-wrap">
-            <table class="table-patients">
+            <table>
                 <thead>
                     <tr>
                         <th>#</th>
@@ -64,10 +64,7 @@
                                 {{ $i + 1 }}
                             </span>
                         </td>
-                        <td>
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" stroke-width="2" style="vertical-align:-2px;margin-right:4px;"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                            {{ $consultation->heure }}
-                        </td>
+                        <td>{{ $consultation->heure }}</td>
                         <td>
                             <div class="user-cell">
                                 <div class="avatar">{{ strtoupper(substr($consultation->patient->prenom, 0, 1) . substr($consultation->patient->nom, 0, 1)) }}</div>
@@ -77,10 +74,7 @@
                                 </div>
                             </div>
                         </td>
-                        <td>
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" stroke-width="2" style="vertical-align:-2px;margin-right:4px;"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                            {{ $consultation->patient->date_naissance ? \Carbon\Carbon::parse($consultation->patient->date_naissance)->age . ' ans' : '-' }}
-                        </td>
+                        <td>{{ $consultation->patient->date_naissance ? \Carbon\Carbon::parse($consultation->patient->date_naissance)->age . ' ans' : '-' }}</td>
                         <td class="truncate" style="max-width:180px;">{{ $consultation->motif }}</td>
                         <td>
                             <span class="badge {{ $consultation->type === 'urgence' ? 'badge-danger' : 'badge-info' }}">
@@ -103,10 +97,9 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" style="text-align:center;padding:32px;">
-                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--gray-300)" stroke-width="1.5" style="margin-bottom:8px;"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                            <div class="text-muted" style="font-size:.875rem;">Aucun patient en attente</div>
-                            <div class="text-muted" style="font-size:.75rem;margin-top:4px;">La file d'attente est vide pour le moment</div>
+                        <td colspan="7" class="text-center" style="padding:60px;">
+                            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5" style="margin:0 auto 16px;display:block;"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                            <p style="color:var(--gray-500);">Aucun patient en attente</p>
                         </td>
                     </tr>
                     @endforelse

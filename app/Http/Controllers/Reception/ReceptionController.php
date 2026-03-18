@@ -36,23 +36,7 @@ class ReceptionController extends Controller
         $patients = Patient::orderBy('nom')->get();
         $medecins = Medecin::where('statut', '!=', 'absent')->orderBy('nom')->get();
 
-        // Chart data - consultations per day (last 7 days)
-        $chartDays = collect(range(6, 0))->map(fn($i) => now()->subDays($i));
-        $consultationsParJour = $chartDays->map(fn($d) => [
-            'date' => $d->locale('fr')->isoFormat('ddd D'),
-            'count' => \App\Models\Consultation::whereDate('date', $d->toDateString())->count(),
-        ]);
-
-        // Chart data - consultations by status
-        $parStatut = [
-            'en_attente' => \App\Models\Consultation::where('statut', 'en_attente')->count(),
-            'en_cours' => \App\Models\Consultation::where('statut', 'en_cours')->count(),
-            'termine' => \App\Models\Consultation::where('statut', 'termine')->count(),
-        ];
-
-        $useCharts = true;
-
-        return view('reception.index', compact('stats', 'consultationsEnAttente', 'derniersPatients', 'patients', 'medecins', 'consultationsParJour', 'parStatut', 'useCharts'));
+        return view('reception.index', compact('stats', 'consultationsEnAttente', 'derniersPatients', 'patients', 'medecins'));
     }
 
     /**
@@ -67,7 +51,8 @@ class ReceptionController extends Controller
             $query->where('statut', $request->statut);
         }
 
-        $factures = $query->orderBy('created_at', 'desc')->paginate(20)->appends($request->query());
+        $factures = $query->orderBy('created_at', 'desc')->paginate(20);
+        $factures->appends($request->query());
 
         return view('reception.factures.index', compact('factures'));
     }

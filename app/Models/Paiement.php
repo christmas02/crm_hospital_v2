@@ -4,11 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Paiement extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     protected $fillable = [
         'patient_id',
@@ -19,10 +18,6 @@ class Paiement extends Model
         'description',
         'mode_paiement',
         'statut',
-        'numero_recu',
-        'reference',
-        'notes',
-        'encaisse_par',
     ];
 
     protected $casts = [
@@ -37,10 +32,5 @@ class Paiement extends Model
     public function facture()
     {
         return $this->belongsTo(Facture::class);
-    }
-
-    public function encaisseur()
-    {
-        return $this->belongsTo(\App\Models\User::class, 'encaisse_par');
     }
 }

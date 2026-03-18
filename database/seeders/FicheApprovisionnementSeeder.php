@@ -4,54 +4,50 @@ namespace Database\Seeders;
 
 use App\Models\FicheApprovisionnement;
 use App\Models\ApprovisionnementLigne;
-use App\Models\Medicament;
 use Illuminate\Database\Seeder;
 
 class FicheApprovisionnementSeeder extends Seeder
 {
     public function run()
     {
-        $medicaments = Medicament::all();
-        if ($medicaments->isEmpty()) return;
-
-        $fournisseurs = ['DPCI', 'Copharmed', 'Laborex', 'Ubipharm'];
-
-        for ($i = 0; $i < 3; $i++) {
-            $selectedMeds = $medicaments->random(rand(3, min(6, $medicaments->count())));
-            $totalQte = 0;
-            $totalMontant = 0;
-
-            $fiche = FicheApprovisionnement::create([
-                'numero' => 'APP-' . date('Y') . '-' . str_pad($i + 1, 3, '0', STR_PAD_LEFT),
-                'date' => now()->subDays(rand(5, 30)),
-                'fournisseur' => $fournisseurs[array_rand($fournisseurs)],
-                'total_articles' => $selectedMeds->count(),
-                'total_quantite' => 0,
-                'montant_total' => 0,
-                'statut' => ['en_attente', 'validee', 'validee'][$i],
-                'observations' => 'Commande de réapprovisionnement',
+        $fiches = [
+            [
+                'id' => 1,
+                'numero' => 'APP-2024-001',
+                'date' => '2024-02-15',
+                'fournisseur' => 'Pharma CI',
+                'total_articles' => 2,
+                'total_quantite' => 300,
+                'montant_total' => 25000,
+                'observations' => 'Commande mensuelle',
                 'cree_par' => 'Pharmacien',
-            ]);
+            ],
+            [
+                'id' => 2,
+                'numero' => 'APP-2024-002',
+                'date' => '2024-02-18',
+                'fournisseur' => 'MedAfrique',
+                'total_articles' => 1,
+                'total_quantite' => 50,
+                'montant_total' => 125000,
+                'observations' => 'Réapprovisionnement urgent antipaludéens',
+                'cree_par' => 'Pharmacien',
+            ],
+        ];
 
-            foreach ($selectedMeds as $med) {
-                $qte = rand(20, 100);
-                $prix = $med->prix_unitaire ?? rand(500, 5000);
-                $totalQte += $qte;
-                $totalMontant += $qte * $prix;
+        foreach ($fiches as $fiche) {
+            FicheApprovisionnement::create($fiche);
+        }
 
-                ApprovisionnementLigne::create([
-                    'fiche_approvisionnement_id' => $fiche->id,
-                    'medicament_id' => $med->id,
-                    'nom' => $med->nom,
-                    'quantite' => $qte,
-                    'prix_unitaire' => $prix,
-                ]);
-            }
+        // Lignes d'approvisionnement
+        $lignes = [
+            ['fiche_approvisionnement_id' => 1, 'medicament_id' => 1, 'nom' => 'Paracétamol 500mg', 'quantite' => 200, 'prix_unitaire' => 50],
+            ['fiche_approvisionnement_id' => 1, 'medicament_id' => 3, 'nom' => 'Amoxicilline 500mg', 'quantite' => 100, 'prix_unitaire' => 150],
+            ['fiche_approvisionnement_id' => 2, 'medicament_id' => 4, 'nom' => 'Arthémether-Luméfantrine', 'quantite' => 50, 'prix_unitaire' => 2500],
+        ];
 
-            $fiche->update([
-                'total_quantite' => $totalQte,
-                'montant_total' => $totalMontant,
-            ]);
+        foreach ($lignes as $ligne) {
+            ApprovisionnementLigne::create($ligne);
         }
     }
 }

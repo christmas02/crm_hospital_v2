@@ -4,12 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Consultation extends Model
 {
-    use HasFactory, SoftDeletes;
-    use \App\Traits\TracksChanges;
+    use HasFactory;
 
     protected $fillable = [
         'patient_id',
@@ -60,15 +58,5 @@ class Consultation extends Model
     public function fileAttente()
     {
         return $this->hasOne(FileAttente::class);
-    }
-
-    public function commentaires()
-    {
-        return $this->hasMany(ConsultationNote::class);
-    }
-
-    public function certificats()
-    {
-        return $this->hasMany(CertificatMedical::class);
     }
 }
