@@ -68,6 +68,11 @@ class User extends Authenticatable
         return $this->role === 'pharmacie';
     }
 
+    public function medecin()
+    {
+        return $this->hasOne(\App\Models\Medecin::class);
+    }
+
     public function hasRole($role)
     {
         if (is_array($role)) {

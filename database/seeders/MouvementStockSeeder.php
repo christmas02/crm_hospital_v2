@@ -3,21 +3,37 @@
 namespace Database\Seeders;
 
 use App\Models\MouvementStock;
+use App\Models\Medicament;
 use Illuminate\Database\Seeder;
 
 class MouvementStockSeeder extends Seeder
 {
     public function run()
     {
-        $mouvements = [
-            ['id' => 1, 'medicament_id' => 1, 'type' => 'entree', 'quantite' => 200, 'date' => '2024-02-15', 'motif' => 'Réapprovisionnement'],
-            ['id' => 2, 'medicament_id' => 4, 'type' => 'sortie', 'quantite' => 24, 'date' => '2024-02-20', 'motif' => 'Prescription patient #1'],
-            ['id' => 3, 'medicament_id' => 5, 'type' => 'sortie', 'quantite' => 30, 'date' => '2024-02-20', 'motif' => 'Prescription patient #2'],
-            ['id' => 4, 'medicament_id' => 3, 'type' => 'entree', 'quantite' => 100, 'date' => '2024-02-18', 'motif' => 'Commande fournisseur'],
-        ];
+        $medicaments = Medicament::all();
+        if ($medicaments->isEmpty()) return;
 
-        foreach ($mouvements as $mouvement) {
-            MouvementStock::create($mouvement);
+        $motifsEntree = ['Réception commande', 'Approvisionnement', 'Don reçu', 'Transfert interne'];
+        $motifsSortie = ['Dispensation patient', 'Périmé retiré', 'Transfert service', 'Ajustement inventaire'];
+
+        foreach ($medicaments->random(min(8, $medicaments->count())) as $med) {
+            // Entrée
+            MouvementStock::create([
+                'medicament_id' => $med->id,
+                'type' => 'entree',
+                'quantite' => rand(20, 100),
+                'motif' => $motifsEntree[array_rand($motifsEntree)],
+                'date' => now()->subDays(rand(5, 30)),
+            ]);
+
+            // Sortie
+            MouvementStock::create([
+                'medicament_id' => $med->id,
+                'type' => 'sortie',
+                'quantite' => rand(5, 20),
+                'motif' => $motifsSortie[array_rand($motifsSortie)],
+                'date' => now()->subDays(rand(1, 10)),
+            ]);
         }
     }
 }

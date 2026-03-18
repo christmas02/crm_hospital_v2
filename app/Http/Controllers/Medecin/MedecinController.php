@@ -16,11 +16,16 @@ use Carbon\Carbon;
 class MedecinController extends Controller
 {
     /**
-     * Obtenir le médecin courant (pour demo, premier médecin)
+     * Obtenir le médecin courant via le compte utilisateur connecté
      */
-    protected function getMedecin()
+    private function getMedecin()
     {
-        return Medecin::first();
+        $medecin = auth()->user()->medecin;
+        if (!$medecin) {
+            // Fallback for dev/demo: use first medecin
+            $medecin = Medecin::first();
+        }
+        return $medecin;
     }
 
     /**
@@ -63,7 +68,13 @@ class MedecinController extends Controller
             'ordonnances_jour' => $ordonnancesCount,
         ];
 
-        return view('medecin.index', compact('medecin', 'consultationsEnAttente', 'consultationEnCours', 'consultationsTerminees', 'stats'));
+        $referencesRecues = \App\Models\Reference::with(['patient', 'medecinReferent'])
+            ->where('medecin_cible_id', $medecin->id)
+            ->where('statut', 'en_attente')
+            ->orderByRaw("FIELD(urgence, 'tres_urgent', 'urgent', 'normal')")
+            ->get();
+
+        return view('medecin.index', compact('medecin', 'consultationsEnAttente', 'consultationEnCours', 'consultationsTerminees', 'stats', 'referencesRecues'));
     }
 
     /**

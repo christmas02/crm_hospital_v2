@@ -33,9 +33,15 @@
 </div>
 
 <div class="card">
+    <div class="card-header">
+        <h2 class="card-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px;"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><path d="M3.27 6.96L12 12.01l8.73-5.05M12 22.08V12"/></svg>
+            Stock Médicaments
+        </h2>
+    </div>
     <div class="card-body no-pad">
         <div class="table-wrap">
-            <table id="stockTable">
+            <table class="table-patients" id="stockTable">
                 <thead>
                     <tr>
                         <th>Médicament</th>
@@ -59,7 +65,10 @@
                         <td>{{ $medicament->categorie ?? '-' }}</td>
                         <td><strong>{{ $medicament->stock }}</strong></td>
                         <td>{{ $medicament->stock_min }}</td>
-                        <td>{{ number_format($medicament->prix_unitaire, 0, ',', ' ') }} F</td>
+                        <td>
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" stroke-width="2" style="vertical-align:middle;margin-right:4px;"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+                            {{ number_format($medicament->prix_unitaire, 0, ',', ' ') }} F
+                        </td>
                         <td>
                             @if($medicament->stock <= 0)
                             <span class="badge badge-danger">Rupture</span>
@@ -70,11 +79,19 @@
                             @endif
                         </td>
                         <td>
-                            <button class="btn btn-outline btn-sm">Modifier</button>
+                            <button class="btn btn-primary btn-sm" onclick="voirMedicament({{ $medicament->id }})">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Voir
+                            </button>
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="7" class="text-center text-muted">Aucun médicament</td></tr>
+                    <tr>
+                        <td colspan="7" style="text-align:center;padding:32px;">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--gray-300)" stroke-width="1.5" style="margin-bottom:8px;"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><path d="M3.27 6.96L12 12.01l8.73-5.05M12 22.08V12"/></svg>
+                            <div class="text-muted" style="font-size:.875rem;">Aucun médicament en stock</div>
+                            <div class="text-muted" style="font-size:.75rem;margin-top:4px;">Commencez par ajouter un médicament au catalogue</div>
+                        </td>
+                    </tr>
                     @endforelse
                 </tbody>
             </table>
@@ -144,7 +161,67 @@
     </div>
 </div>
 
+<!-- Modal Détail Médicament -->
+<div class="modal-overlay" id="modalVoirMedic">
+    <div class="modal" style="max-width:500px;">
+        <div class="modal-header">
+            <h3 class="modal-title">Détail du médicament</h3>
+            <button class="modal-close" onclick="closeModal('modalVoirMedic')">&times;</button>
+        </div>
+        <div class="modal-body" id="modalVoirMedicContent">
+            @foreach($medicaments as $medicament)
+            <div id="medic-{{ $medicament->id }}" style="display:none;">
+                <div style="text-align:center;margin-bottom:20px;">
+                    <div style="display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;background:var(--primary-light);color:var(--primary);border-radius:50%;margin-bottom:8px;">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><path d="M3.27 6.96L12 12.01l8.73-5.05M12 22.08V12"/></svg>
+                    </div>
+                    <h3 style="font-weight:700;margin:0;">{{ $medicament->nom }}</h3>
+                    <div class="text-muted text-sm">{{ $medicament->forme ?? 'Comprimé' }} {{ $medicament->dosage ? '- ' . $medicament->dosage : '' }}</div>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+                    <div style="background:var(--gray-50);border-radius:8px;padding:12px;">
+                        <div class="text-muted text-sm">Catégorie</div>
+                        <strong>{{ $medicament->categorie ?? '-' }}</strong>
+                    </div>
+                    <div style="background:var(--gray-50);border-radius:8px;padding:12px;">
+                        <div class="text-muted text-sm">Prix unitaire</div>
+                        <strong>{{ number_format($medicament->prix_unitaire, 0, ',', ' ') }} F</strong>
+                    </div>
+                    <div style="background:var(--gray-50);border-radius:8px;padding:12px;">
+                        <div class="text-muted text-sm">Stock actuel</div>
+                        <strong class="{{ $medicament->stock <= $medicament->stock_min ? 'text-danger' : '' }}">{{ $medicament->stock }}</strong>
+                    </div>
+                    <div style="background:var(--gray-50);border-radius:8px;padding:12px;">
+                        <div class="text-muted text-sm">Stock minimum</div>
+                        <strong>{{ $medicament->stock_min }}</strong>
+                    </div>
+                </div>
+
+                <div style="text-align:center;">
+                    @if($medicament->stock <= 0)
+                    <span class="badge badge-danger" style="font-size:0.85rem;padding:6px 16px;">Rupture de stock</span>
+                    @elseif($medicament->stock <= $medicament->stock_min)
+                    <span class="badge badge-warning" style="font-size:0.85rem;padding:6px 16px;">Stock bas - Réapprovisionner</span>
+                    @else
+                    <span class="badge badge-success" style="font-size:0.85rem;padding:6px 16px;">Stock OK</span>
+                    @endif
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+</div>
+
 <script>
+let currentMedicId = null;
+function voirMedicament(id) {
+    if (currentMedicId) document.getElementById('medic-' + currentMedicId).style.display = 'none';
+    document.getElementById('medic-' + id).style.display = 'block';
+    currentMedicId = id;
+    openModal('modalVoirMedic');
+}
+
 function filterStock() {
     const search = document.getElementById('searchMedic').value.toLowerCase();
     const cat = document.getElementById('filterCat').value.toLowerCase();

@@ -12,39 +12,43 @@
 
 <!-- Stats -->
 <div class="stats" style="grid-template-columns:repeat(4,1fr);">
-    <div class="stat-card" style="background:linear-gradient(135deg,#dcfce7,#bbf7d0);border:none;">
+    <div class="stat-card" style="border-left: 4px solid var(--secondary);background:linear-gradient(135deg,#dcfce7,#bbf7d0);border-top:none;border-right:none;border-bottom:none;">
         <div>
             <div class="stat-label">Recettes du jour</div>
             <div class="stat-value text-success">{{ number_format($stats['recettes_jour'], 0, ',', ' ') }} F</div>
+            <div class="stat-sub">Total des entrées aujourd'hui</div>
         </div>
         <div class="stat-icon green">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
         </div>
     </div>
-    <div class="stat-card" style="background:linear-gradient(135deg,#fee2e2,#fecaca);border:none;">
+    <div class="stat-card" style="border-left: 4px solid var(--danger);background:linear-gradient(135deg,#fee2e2,#fecaca);border-top:none;border-right:none;border-bottom:none;">
         <div>
             <div class="stat-label">Dépenses du jour</div>
             <div class="stat-value text-danger">{{ number_format($stats['depenses_jour'], 0, ',', ' ') }} F</div>
+            <div class="stat-sub">Total des sorties aujourd'hui</div>
         </div>
         <div class="stat-icon red">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
         </div>
     </div>
-    <div class="stat-card" style="background:linear-gradient(135deg,#dbeafe,#bfdbfe);border:none;">
+    <div class="stat-card" style="border-left: 4px solid var(--primary);background:linear-gradient(135deg,#dbeafe,#bfdbfe);border-top:none;border-right:none;border-bottom:none;">
         <div>
             <div class="stat-label">Solde du jour</div>
             <div class="stat-value {{ $stats['solde_jour'] >= 0 ? 'text-success' : 'text-danger' }}">
                 {{ number_format($stats['solde_jour'], 0, ',', ' ') }} F
             </div>
+            <div class="stat-sub">Balance recettes - dépenses</div>
         </div>
         <div class="stat-icon cyan">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>
         </div>
     </div>
-    <div class="stat-card" style="background:linear-gradient(135deg,#fef3c7,#fde68a);border:none;">
+    <div class="stat-card" style="border-left: 4px solid var(--warning);background:linear-gradient(135deg,#fef3c7,#fde68a);border-top:none;border-right:none;border-bottom:none;">
         <div>
             <div class="stat-label">Impayés</div>
             <div class="stat-value text-warning">{{ number_format($stats['impayes'], 0, ',', ' ') }} F</div>
+            <div class="stat-sub">Paiements en attente</div>
         </div>
         <div class="stat-icon orange">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
@@ -85,9 +89,15 @@
     </div>
 
     <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px;vertical-align:-3px;"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+                Paiements patients
+            </h2>
+        </div>
         <div class="card-body no-pad">
             <div class="table-wrap">
-                <table>
+                <table class="table-patients">
                     <thead>
                         <tr><th>Patient</th><th>Date</th><th>Type</th><th>Montant</th><th>Mode</th><th>Description</th><th>Statut</th></tr>
                     </thead>
@@ -100,9 +110,19 @@
                                     <span>{{ $paiement->patient->prenom }} {{ $paiement->patient->nom }}</span>
                                 </div>
                             </td>
-                            <td>{{ \Carbon\Carbon::parse($paiement->date_paiement)->format('d/m/Y') }}</td>
+                            <td>
+                                <div style="display:flex;align-items:center;gap:8px;">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                                    {{ \Carbon\Carbon::parse($paiement->date_paiement)->format('d/m/Y') }}
+                                </div>
+                            </td>
                             <td>{{ $paiement->type }}</td>
-                            <td><strong class="text-success">{{ number_format($paiement->montant, 0, ',', ' ') }} F</strong></td>
+                            <td>
+                                <div style="display:flex;align-items:center;gap:8px;">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+                                    <strong class="text-success">{{ number_format($paiement->montant, 0, ',', ' ') }} F</strong>
+                                </div>
+                            </td>
                             <td>
                                 @php $modes = ['especes'=>'Espèces','mobile_money'=>'Mobile Money','carte'=>'Carte','virement'=>'Virement']; @endphp
                                 {{ $modes[$paiement->mode_paiement] ?? $paiement->mode_paiement }}
@@ -114,7 +134,11 @@
                             </td>
                         </tr>
                         @empty
-                        <tr><td colspan="7" class="text-center text-muted" style="padding:40px;">Aucun paiement</td></tr>
+                        <tr><td colspan="7" style="text-align:center;padding:32px;">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--gray-300)" stroke-width="1.5" style="margin-bottom:8px;"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+                            <div class="text-muted" style="font-size:.875rem;">Aucun paiement</div>
+                            <div class="text-muted" style="font-size:.75rem;margin-top:4px;">Enregistrez un nouveau paiement pour commencer</div>
+                        </td></tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -146,16 +170,27 @@
     </div>
 
     <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px;vertical-align:-3px;"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>
+                Transactions
+            </h2>
+        </div>
         <div class="card-body no-pad">
             <div class="table-wrap">
-                <table>
+                <table class="table-patients">
                     <thead>
                         <tr><th>Date</th><th>Description</th><th>Catégorie</th><th>Entrée</th><th>Sortie</th></tr>
                     </thead>
                     <tbody>
                         @forelse($transactions as $transaction)
                         <tr>
-                            <td>{{ $transaction->date->format('d/m/Y') }}</td>
+                            <td>
+                                <div style="display:flex;align-items:center;gap:8px;">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                                    {{ $transaction->date->format('d/m/Y') }}
+                                </div>
+                            </td>
                             <td>{{ $transaction->description }}</td>
                             <td>
                                 <span style="font-size:0.75rem;background:var(--gray-100);padding:2px 8px;border-radius:20px;text-transform:capitalize;">
@@ -164,21 +199,31 @@
                             </td>
                             <td>
                                 @if($transaction->type === 'entree')
-                                <strong class="text-success">{{ number_format($transaction->montant, 0, ',', ' ') }} F</strong>
+                                <div style="display:flex;align-items:center;gap:8px;">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+                                    <strong class="text-success">{{ number_format($transaction->montant, 0, ',', ' ') }} F</strong>
+                                </div>
                                 @else
                                 <span class="text-muted">—</span>
                                 @endif
                             </td>
                             <td>
                                 @if($transaction->type === 'sortie')
-                                <strong class="text-danger">{{ number_format($transaction->montant, 0, ',', ' ') }} F</strong>
+                                <div style="display:flex;align-items:center;gap:8px;">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+                                    <strong class="text-danger">{{ number_format($transaction->montant, 0, ',', ' ') }} F</strong>
+                                </div>
                                 @else
                                 <span class="text-muted">—</span>
                                 @endif
                             </td>
                         </tr>
                         @empty
-                        <tr><td colspan="5" class="text-center text-muted" style="padding:40px;">Aucune transaction</td></tr>
+                        <tr><td colspan="5" style="text-align:center;padding:32px;">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--gray-300)" stroke-width="1.5" style="margin-bottom:8px;"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>
+                            <div class="text-muted" style="font-size:.875rem;">Aucune transaction</div>
+                            <div class="text-muted" style="font-size:.75rem;margin-top:4px;">Ajoutez une transaction pour commencer le suivi</div>
+                        </td></tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -196,7 +241,10 @@
 <div class="modal-overlay" id="modalPaiement">
     <div class="modal" style="max-width:540px;">
         <div class="modal-header">
-            <h3 class="modal-title">Nouveau Paiement</h3>
+            <h3 class="modal-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px;vertical-align:-3px;"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+                Nouveau Paiement
+            </h3>
             <button class="modal-close" onclick="closeModal('modalPaiement')">✕</button>
         </div>
         <form action="{{ route('admin.caisse.paiements.store') }}" method="POST">
@@ -265,7 +313,10 @@
 <div class="modal-overlay" id="modalTransaction">
     <div class="modal" style="max-width:460px;">
         <div class="modal-header">
-            <h3 class="modal-title">Nouvelle Transaction</h3>
+            <h3 class="modal-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px;vertical-align:-3px;"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>
+                Nouvelle Transaction
+            </h3>
             <button class="modal-close" onclick="closeModal('modalTransaction')">✕</button>
         </div>
         <form action="{{ route('admin.caisse.transactions.store') }}" method="POST">

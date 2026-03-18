@@ -9,53 +9,80 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call([
-            // 1. Tables indépendantes
+            // 1. Utilisateurs de démo (nécessaire pour les FK)
+            UserSeeder::class,
+
+            // 2. Tables indépendantes
             MedecinSeeder::class,
             MedicamentSeeder::class,
             ActeMedicalSeeder::class,
 
-            // 2. Patients (nécessaire pour chambres)
+            // 3. Examens de laboratoire
+            ExamenLaboSeeder::class,
+
+            // 4. Patients
             PatientSeeder::class,
 
-            // 3. Chambres (référence patients)
+            // 5. Personnel
+            PersonnelSeeder::class,
+
+            // 6. Chambres
             ChambreSeeder::class,
 
-            // 4. Dossiers médicaux
+            // 7. Dossiers médicaux
             DossierMedicalSeeder::class,
 
-            // 5. Consultations
+            // 8. Consultations
             ConsultationSeeder::class,
 
-            // 6. Fiches de traitement et actes pivot
+            // 9. Signes vitaux (après consultations)
+            SigneVitalSeeder::class,
+
+            // 10. Fiches de traitement et actes pivot
             FicheTraitementSeeder::class,
 
-            // 7. Ordonnances et médicaments pivot
+            // 11. Ordonnances et prescriptions
             OrdonnanceSeeder::class,
             PrescriptionSeeder::class,
 
-            // 8. Factures et lignes
+            // 12. Certificats médicaux (après consultations)
+            CertificatMedicalSeeder::class,
+
+            // 13. Demandes de laboratoire (après consultations)
+            DemandeLaboSeeder::class,
+
+            // 14. Vaccinations
+            VaccinationSeeder::class,
+
+            // 15. Références (après consultations)
+            ReferenceSeeder::class,
+
+            // 16. Factures et lignes
             FactureSeeder::class,
 
-            // 9. Paiements et transactions
+            // 17. Paiements et transactions
             PaiementSeeder::class,
             TransactionSeeder::class,
 
-            // 10. Planning médecins
+            // 18. Sessions de caisse
+            CaisseSessionSeeder::class,
+
+            // 19. Planning médecins
             PlanningSeeder::class,
 
-            // 11. Rendez-vous et file d'attente
+            // 20. Rendez-vous et file d'attente
             RendezvousSeeder::class,
             FileAttenteSeeder::class,
 
-            // 12. Hospitalisations
+            // 21. Hospitalisations
             HospitalisationSeeder::class,
 
-            // 13. Pharmacie - approvisionnement et stock
+            // 22. Pharmacie - approvisionnement et stock
             FicheApprovisionnementSeeder::class,
             MouvementStockSeeder::class,
 
-            // 14. Utilisateurs de démo
-            UserSeeder::class,
+            // 23. Journal d'audit
+            AuditLogSeeder::class,
         ]);
     }
 }
