@@ -67,6 +67,35 @@ class Patient extends Model
         return $this->hasMany(Facture::class);
     }
 
+    public function documents()
+    {
+        return $this->hasMany(PatientDocument::class);
+    }
+
+    public function signesVitaux()
+    {
+        return $this->hasMany(SigneVital::class);
+    }
+
+    public function certificats()
+    {
+        return $this->hasMany(CertificatMedical::class);
+    }
+
+    public function vaccinations()
+    {
+        return $this->hasMany(Vaccination::class);
+    }
+
+    public function demandesLabo() { return $this->hasMany(DemandeLabo::class); }
+
+    public function references() { return $this->hasMany(Reference::class); }
+
+    public function routeNotificationForMail()
+    {
+        return $this->email;
+    }
+
     public function getNomCompletAttribute()
     {
         return $this->prenom . ' ' . $this->nom;
