@@ -4,12 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Medecin extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
+    use \App\Traits\TracksChanges;
 
     protected $fillable = [
+        'user_id',
         'nom',
         'prenom',
         'specialite',
@@ -18,7 +21,15 @@ class Medecin extends Model
         'bureau',
         'statut',
         'tarif_consultation',
+        'taux_commission',
+        'salaire_base',
+        'photo',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function consultations()
     {
@@ -53,6 +64,16 @@ class Medecin extends Model
     public function rendezvous()
     {
         return $this->hasMany(Rendezvous::class);
+    }
+
+    public function referencesEmises()
+    {
+        return $this->hasMany(Reference::class, 'medecin_referent_id');
+    }
+
+    public function referencesRecues()
+    {
+        return $this->hasMany(Reference::class, 'medecin_cible_id');
     }
 
     public function getNomCompletAttribute()
