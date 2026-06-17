@@ -1,43 +1,81 @@
-# CRM Hospital V2 - MediCare Pro
+# CLAUDE.md
 
-## Project Overview
-Laravel 9 hospital management CRM with modules: Reception, Medecin, Caisse, Pharmacie, Admin.
-Uses MAMP (MySQL port 8889, user root/root), Tailwind CSS, Vite, Alpine.js.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## BMAD Method - AI Agent Framework
+## Projet
 
-This project uses the **BMAD Method v6** (Build More, Architect Dreams) multi-agent framework.
+**MediCare Pro** — Système de gestion hospitalière. Migration depuis HTML/JS vanilla vers Laravel 9.
 
-### Available Agents (in `.bmad/agents/`)
+- **URL locale** : `http://localhost/hopital/public/`
+- **Base de données** : `hopital_medicare` (MySQL)
+- **Stack** : Laravel 9, Laravel Breeze (auth), PHP 8.x, CSS custom (`public/css/style.css`), Vite, Alpine.js
 
-| Agent | Name | Role |
-|-------|------|------|
-| `bmad-agent-analyst` | Analyst | Requirements analysis and research |
-| `bmad-agent-pm` | PM (Product Manager) | PRD creation, product strategy |
-| `bmad-agent-architect` | Architect | System architecture and technical design |
-| `bmad-agent-dev` | Amelia (Developer) | Story execution and code implementation |
-| `bmad-agent-qa` | QA Engineer | Testing strategy and quality assurance |
-| `bmad-agent-sm` | Scrum Master | Sprint planning and agile ceremonies |
-| `bmad-agent-ux-designer` | UX Designer | User experience and interface design |
-| `bmad-agent-tech-writer` | Tech Writer | Documentation and technical writing |
-| `bmad-agent-quick-flow-solo-dev` | Quick Flow Solo | Rapid solo development workflow |
+## Commandes
 
-### Available Skills (in `.bmad/skills/`)
-- `bmad-init` - Initialize project configuration
-- `bmad-help` - Get help on BMAD framework
-- `bmad-brainstorming` - Guided brainstorming sessions
-- `bmad-advanced-elicitation` - Deep requirements elicitation
-- `bmad-distillator` - Distill complex information
-- `bmad-party-mode` - Fun collaborative mode
-- `bmad-review-adversarial-general` - Adversarial review
-- `bmad-review-edge-case-hunter` - Edge case analysis
+```bash
+# Développement
+php artisan serve                        # serveur de dev
+npm run dev                              # assets Vite (watch)
+npm run build                            # build assets production
 
-### Workflows (in `.bmad/workflows/`)
-1. **Analysis**: Product brief, market/domain/technical research
-2. **Planning**: PRD creation/editing/validation, UX design
-3. **Solutioning**: Architecture, epics & stories, implementation readiness
-4. **Implementation**: Story creation, sprint planning, retrospectives
-5. **Quick Flow**: Rapid spec and dev workflows
+# Base de données
+php artisan migrate                      # appliquer les migrations
+php artisan db:seed                      # seeder les données de démo
+php artisan migrate:fresh --seed         # reset complet + seed
 
-### How to Use
-To activate an agent, read its SKILL.md file from `.bmad/agents/{agent-name}/SKILL.md` and follow its instructions.
+# Tests
+php artisan test                         # tous les tests
+php artisan test --filter NomDuTest      # test ciblé
+```
+
+## Architecture
+
+### Modules et routes
+
+Chaque module correspond à un préfixe URL, un namespace de controllers, et un rôle utilisateur :
+
+| Module | Préfixe | Rôle requis |
+|--------|---------|-------------|
+| Admin | `/admin` | `admin` |
+| Réception | `/reception` | `reception`, `admin` |
+| Médecin | `/medecin` | `medecin`, `admin` |
+| Caisse | `/caisse` | `caisse`, `admin` |
+| Pharmacie | `/pharmacie` | `pharmacie`, `admin` |
+
+Le contrôle d'accès passe par `CheckRole` middleware (`app/Http/Middleware/CheckRole.php`), enregistré sous l'alias `role:` dans le Kernel. Les routes sont définies dans `routes/web.php` avec des groupes `middleware(['auth', 'role:xxx'])`.
+
+### Layout et vues
+
+Le layout principal est `resources/views/layouts/medicare.blade.php`. Il expose `@yield('sidebar-nav')` — chaque module injecte son propre partial sidebar (`resources/views/{module}/_sidebar.blade.php`).
+
+Le **dashboard** (`resources/views/dashboard.blade.php`) est la seule vue sans sidebar : c'est un sélecteur de modules avec accès grisés selon le rôle.
+
+### Flux métier principal
+
+```
+Réception → crée Consultation (statut: en_attente)
+         → Médecin démarre consultation (statut: en_cours)
+         → Médecin soumet FicheTraitement + actes médicaux
+           └─ FicheTraitementController::store() crée automatiquement la Facture si total_facturable > 0
+         → Médecin émet Ordonnance
+         → Pharmacie prépare/remet l'ordonnance (décrément stock)
+         → Caisse encaisse la Facture (statut: payee, crée Paiement + Transaction)
+```
+
+### Modèles clés
+
+- **`Consultation`** : pivot central. Relie `Patient`, `Medecin`, `FicheTraitement`, `Ordonnance`, `Facture`, `FileAttente`.
+- **`FicheTraitement`** : liée à une `Consultation`. Contient les actes via pivot `fiche_traitement_actes` (colonnes pivot : `nom`, `prix`, `quantite`, `facturable`). Méthode `actes()` = alias de `actesMedicaux()`.
+- **`Facture`** : générée automatiquement par `FicheTraitementController`. L'accessor `montant_total` préfère `lignes` si chargées, sinon retourne `montant` — toujours eager-loader `lignes` pour éviter une valeur incorrecte.
+- **`OrdonnanceMedicament`** : stocke le `nom` du médicament en string (pas de FK `medicament_id`).
+- **`Medecin`** : lié à `User` via `user_id`. `getMedecin()` dans les controllers utilise `auth()->user()->medecin` avec fallback sur `Medecin::first()` pour le mode démo.
+
+### Seeders (ordre obligatoire)
+
+Le `DatabaseSeeder` appelle les seeders dans un ordre précis (dépendances entre tables). Le `UserSeeder` crée les comptes de démo en dernier.
+
+Comptes de démo : `admin@medicare.ci`, `reception@medicare.ci`, `medecin@medicare.ci`, `caisse@medicare.ci`, `pharmacie@medicare.ci` — tous avec le mot de passe `password`.
+
+## Après chaque modification
+
+Documenter dans `historique.md` : phase numérotée, fichiers modifiés, nouvelles routes, correctifs.

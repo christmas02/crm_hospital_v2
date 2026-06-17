@@ -12,6 +12,7 @@ class Medecin extends Model
     use \App\Traits\TracksChanges;
 
     protected $fillable = [
+        'user_id',
         'nom',
         'prenom',
         'specialite',
@@ -23,7 +24,6 @@ class Medecin extends Model
         'taux_commission',
         'salaire_base',
         'photo',
-        'user_id',
     ];
 
     public function user()

@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use App\Models\Medecin;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -45,7 +45,11 @@ class UserSeeder extends Seeder
         ];
 
         foreach ($users as $user) {
-            User::create($user);
+            $created = User::create($user);
+
+            if ($created->role === 'medecin') {
+                Medecin::where('id', 1)->update(['user_id' => $created->id]);
+            }
         }
 
         // Note: le lien User-Medecin est fait dans MedecinSeeder (après création des médecins)
