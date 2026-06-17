@@ -10,7 +10,6 @@ use Illuminate\Notifications\Notifiable;
 class Patient extends Model
 {
     use HasFactory, SoftDeletes, Notifiable;
-    use \App\Traits\TracksChanges;
 
     protected $fillable = [
         'nom',

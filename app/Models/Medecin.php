@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Medecin extends Model
 {
     use HasFactory, SoftDeletes;
-    use \App\Traits\TracksChanges;
 
     protected $fillable = [
         'user_id',
