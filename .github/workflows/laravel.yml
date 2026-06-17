@@ -31,7 +31,7 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./
-          server-dir: /web/demo/
+          server-dir: /web/app/
           exclude: |
             **/.git*
             **/.git*/**
